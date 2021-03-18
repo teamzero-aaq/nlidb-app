@@ -22,6 +22,7 @@ class _SpeechScreenState extends State<SpeechScreen> {
   double _confidence = 1.0;
   bool loading = false;
   bool visible = false;
+  bool is_aggregate;
   List<List<DataCell>> rows = [];
 
   submit() {
@@ -40,24 +41,24 @@ class _SpeechScreenState extends State<SpeechScreen> {
 
     await http.get("http://192.168.29.87:8000/nlphindi?hindi_sentence="+Uri.encodeFull(_textEditingController.value.text)).then((response) {
       var result = json.decode(response.body.toString());
+      var body = json.decode(utf8.decode(response.bodyBytes));
       if(response.statusCode == 200) {
-        if(result.containsKey("error")) {
+        if(body.containsKey("error")) {
           Toast.show(result["error"], context, duration: 5, gravity:  Toast.BOTTOM);
         } else {
           setState(() {
-            query = result["query"];
-            statement = result["statement"];
-            tables = result["tables"];
-            columns = result["columns"];
-            data = result["data"];
+            query = body["query"];
+            statement = body["statement"];
+            tables = body["tables"];
+            columns = body["columns"];
+            data = body["data"];
+            is_aggregate = body["is_aggregate"];
 
             print(query);
             print(statement);
             print(columns.length);
             print(tables);
             print(data);
-            print(data[0]);
-            print(data[0].runtimeType);
 
             for(int i = 0; i < data.length ; i++) {
               List<DataCell> temp = [];
@@ -197,13 +198,13 @@ class _SpeechScreenState extends State<SpeechScreen> {
       ],
     ) : Scaffold(
       appBar: AppBar(
-        title: Text(query),
+        title: Text('Output'),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          child: is_aggregate == true ? Text(data[0][0].toString(), style: TextStyle(fontSize: 70),) : DataTable(
             columns: columns.map((name) => DataColumn(label: Text(name))).toList(),
             rows: rows.map((row) => DataRow(cells: row)).toList(),
           )
