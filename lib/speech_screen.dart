@@ -47,7 +47,7 @@ class _SpeechScreenState extends State<SpeechScreen> {
   double _confidence = 1.0;
   bool loading = false;
   bool visible = true;
-  bool is_aggregate = false;
+  bool is_aggregate = true;
   List<List<DataCell>> rows = [
     [
       DataCell(Text("19")),
@@ -306,29 +306,6 @@ class _SpeechScreenState extends State<SpeechScreen> {
                     padding:
                         const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     child: Text(
-                      "Statement".toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                    child: Text(
-                      statement,
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                    child: Text(
                       "Query".toUpperCase(),
                       style: TextStyle(
                         color: Colors.redAccent,
@@ -348,15 +325,46 @@ class _SpeechScreenState extends State<SpeechScreen> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                    child: Text(
+                      "Statement".toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                    child: Text(
+                      statement,
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 10,
                   ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: is_aggregate == true
-                        ? Text(
-                            data[0][0].toString(),
-                            style: TextStyle(fontSize: 50),
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 20),
+                            width: MediaQuery.of(context).size.width,
+                            child: Center(
+                              child: Text(
+                                "${data[0][0].toString()}",
+                                style: TextStyle(
+                                    fontSize: 40, color: Colors.redAccent),
+                              ),
+                            ),
                           )
                         : DataTable(
                             columns: columns
