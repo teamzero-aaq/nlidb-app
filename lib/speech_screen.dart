@@ -19,97 +19,14 @@ class _SpeechScreenState extends State<SpeechScreen> {
   stt.SpeechToText _speech;
   bool _isListening = false;
   String text = 'Press the button and start speaking';
-  String _text = "",
-      query = "कौन से छात्रों ने अर्थशास्त्र लिया ?",
-      statement =
-          "SELECT * FROM Student NATURAL JOIN Courses WHERE LOWER(Courses.course) LIKE '%Economics%";
-  List tables = ["Student", "Courses"],
-      columns = [
-        "student_id",
-        "name",
-        "course_id",
-        "city",
-        "age",
-        "grade",
-        "course",
-        "day_id",
-        "dept_id",
-        "teacher_id"
-      ],
-      data = [
-        [19, "mahesh", 11, "Kolkata", 21, 76, "Economics", "4", 1, 2],
-        [20, "Ishita", 11, "Chennai", 21, 34, "Economics", "4", 1, 2],
-        [21, "ROHIT", 11, "Chennai", 21, 76, "Economics", "4", 1, 2],
-        [25, "Ankit", 11, "Jaipur", 22, 87, "Economics", "4", 1, 2],
-        [32, "Aishwarya", 11, "Indore", 18, 88, "Economics", "4", 1, 2]
-      ];
+  String _text = "", query = "", statement = "";
+  List tables = [], columns = [], data = [];
   TextEditingController _textEditingController;
   double _confidence = 1.0;
   bool loading = false;
-  bool visible = true;
-  bool is_aggregate = true;
-  List<List<DataCell>> rows = [
-    [
-      DataCell(Text("19")),
-      DataCell(Text("mahesh")),
-      DataCell(Text("11")),
-      DataCell(Text("Kolkata")),
-      DataCell(Text("21")),
-      DataCell(Text("76")),
-      DataCell(Text("Economics")),
-      DataCell(Text("4")),
-      DataCell(Text("1")),
-      DataCell(Text("2")),
-    ],
-    [
-      DataCell(Text("19")),
-      DataCell(Text("mahesh")),
-      DataCell(Text("11")),
-      DataCell(Text("Kolkata")),
-      DataCell(Text("21")),
-      DataCell(Text("76")),
-      DataCell(Text("Economics")),
-      DataCell(Text("4")),
-      DataCell(Text("1")),
-      DataCell(Text("2")),
-    ],
-    [
-      DataCell(Text("19")),
-      DataCell(Text("mahesh")),
-      DataCell(Text("11")),
-      DataCell(Text("Kolkata")),
-      DataCell(Text("21")),
-      DataCell(Text("76")),
-      DataCell(Text("Economics")),
-      DataCell(Text("4")),
-      DataCell(Text("1")),
-      DataCell(Text("2")),
-    ],
-    [
-      DataCell(Text("19")),
-      DataCell(Text("mahesh")),
-      DataCell(Text("11")),
-      DataCell(Text("Kolkata")),
-      DataCell(Text("21")),
-      DataCell(Text("76")),
-      DataCell(Text("Economics")),
-      DataCell(Text("4")),
-      DataCell(Text("1")),
-      DataCell(Text("2")),
-    ],
-    [
-      DataCell(Text("19")),
-      DataCell(Text("mahesh")),
-      DataCell(Text("11")),
-      DataCell(Text("Kolkata")),
-      DataCell(Text("21")),
-      DataCell(Text("76")),
-      DataCell(Text("Economics")),
-      DataCell(Text("4")),
-      DataCell(Text("1")),
-      DataCell(Text("2")),
-    ],
-  ];
+  bool visible = false;
+  bool is_aggregate = false;
+  List<List<DataCell>> rows = [];
 
   submit() {
     rows = [];
@@ -125,7 +42,7 @@ class _SpeechScreenState extends State<SpeechScreen> {
 
   getResponse(String text) async {
     await http
-        .get("http://192.168.29.87:8000/nlphindi?hindi_sentence=" +
+        .get("http://192.168.29.87:8000/get-data?query=" +
             Uri.encodeFull(_textEditingController.value.text))
         .then((response) {
       var result = json.decode(response.body.toString());
@@ -145,7 +62,7 @@ class _SpeechScreenState extends State<SpeechScreen> {
 
             print(query);
             print(statement);
-            print(columns.length);
+            print(columns);
             print(tables);
             print(data);
 
@@ -258,7 +175,7 @@ class _SpeechScreenState extends State<SpeechScreen> {
                             controller: _textEditingController,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'Or Enter HINDI Text Here'),
+                                hintText: 'Eg: सभी छात्रों का नाम क्या है?'),
                             onSubmitted: (val) {
                               setState(() {
                                 loading = true;
@@ -300,7 +217,30 @@ class _SpeechScreenState extends State<SpeechScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 10,
+                    height: 20,
+                  ),
+                  Center(
+                    child: RoundedButton(
+                      text: "New Input",
+                      press: () {
+                        setState(() {
+                          visible = false;
+                          query = "";
+                          data = [];
+                          rows = [];
+                          columns = [];
+                          tables = [];
+                          is_aggregate = false;
+                          statement = "";
+                          loading = false;
+                          _isListening = false;
+                          _textEditingController.text = "";
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 40,
                   ),
                   Padding(
                     padding:
@@ -377,19 +317,6 @@ class _SpeechScreenState extends State<SpeechScreen> {
                             rows:
                                 rows.map((row) => DataRow(cells: row)).toList(),
                           ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Center(
-                    child: RoundedButton(
-                      text: "Search Query",
-                      press: () {
-                        setState(() {
-                          visible = false;
-                        });
-                      },
-                    ),
                   ),
                 ],
               ),
